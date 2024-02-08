@@ -3,11 +3,11 @@ Transform: AWS::Serverless-2016-10-31
 Description: >
   madison-reed-old-deployment-checker
 
-  Sample SAM Template for madison-reed-old-deployment-checker
+  Checks for outdated CloudFormation stacks and deletes them based on the CleanupDate and static state.
 
 Globals:
   Function:
-    Timeout: 3
+    Timeout: 120
     MemorySize: 128
 
 Resources:
@@ -16,13 +16,13 @@ Resources:
     Properties:
       Role: !GetAtt LambdaRole.Arn
       CodeUri: deploymentChecker/
-      Handler: app.lambda_handler  # Assuming your Python file is named app.py and the handler function is named lambda_handler
-      Runtime: python3.11  # Specify the Python runtime version you are using
+      Handler: app.lambda_handler
+      Runtime: python3.11
       Events:
         Schedule:
           Type: Schedule
           Properties:
-            Schedule: cron(0 12 ? * 6 *)  # Example: Every Saturday at 12:00 PM UTC
+            Schedule: cron(0 12 ? * 6 *) # Every Saturday at 12 PM
 
   LambdaRole:
     Type: AWS::IAM::Role
