@@ -1,0 +1,47 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  madison-reed-old-deployment-checker
+
+  Sample SAM Template for madison-reed-old-deployment-checker
+
+Globals:
+  Function:
+    Timeout: 3
+    MemorySize: 128
+
+Resources:
+  DeploymentCheckerLambda:
+    Type: AWS::Serverless::Function
+    Properties:
+      Role: !GetAtt LambdaRole.Arn
+      CodeUri: deploymentChecker/
+      Handler: app.lambda_handler  # Assuming your Python file is named app.py and the handler function is named lambda_handler
+      Runtime: python3.11  # Specify the Python runtime version you are using
+      Events:
+        Schedule:
+          Type: Schedule
+          Properties:
+            Schedule: cron(0 12 ? * 6 *)  # Example: Every Saturday at 12:00 PM UTC
+
+  LambdaRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: CloudFormationManagementPolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - cloudformation:DescribeStacks
+                  - cloudformation:ListStacks
+                  - cloudformation:DeleteStack
+                Resource: '*'
